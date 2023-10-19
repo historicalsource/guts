@@ -1,0 +1,30 @@
+; $Id: idt_vectors.mac,v 1.4 1997/07/01 20:54:19 shepperd Exp $
+	MK_VECTOR   IRQ0	U32 1	< Interrupt 0>
+	MK_VECTOR   IRQ1	U32 1	< Interrupt 1>
+	MK_VECTOR   IRQ2	U32 1	< Interrupt 2>
+	MK_VECTOR   IRQ3	U32 1	< Interrupt 3>
+	MK_VECTOR   IRQ4	U32 1	< Interrupt 4>
+	MK_VECTOR   IRQ5	U32 1	< Interrupt 5>
+	MK_VECTOR   IRQ6	U32 1	< Interrupt 6>
+	MK_VECTOR   IRQ7	U32 1	< Interrupt 7>
+	MK_VECTOR   TLB		U32 1	< TLB exception >
+	MK_VECTOR   TMP		U32 1	<Not used anymore, remains only for compatibility with old stub>
+	MK_VECTOR   NORMAL	U32 1	<Not used anymore, remains only for compatibility with old stub>
+	MK_VECTOR   CHEAP	U32 1	<Not used anymore, remains only for compatibility with old stub>
+	MK_VECTOR   TLBM	U32 1	<TLB modification exception address>
+	MK_VECTOR   TLBL	U32 1	<TLB Load exception address>
+	MK_VECTOR   TLBS	U32 1	<TLB store exception address>
+	MK_VECTOR   ADDRL	U32 1	<Address exception on load or I-fetch>
+	MK_VECTOR   ADDRS	U32 1	<Address exception on store>
+	MK_VECTOR   BUSERRI	U32 1	<Bus error on I-fetch>
+	MK_VECTOR   BUSERRD	U32 1	<Bus error on data load>
+	MK_VECTOR   SYSCALL	U32 1	<SYSCALL exception>
+	MK_VECTOR   BREAK	U32 1	<Breakpoint exception>
+	MK_VECTOR   RESERV	U32 1	<Reserved instruction exception>
+	MK_VECTOR   COPROC	U32 1	<Coprocessor unusable exception>
+	MK_VECTOR   OVERFL	U32 1	<Integer overflow exception>
+.if true, (PROCESSOR&-16) == MIPS4000
+	MK_VECTOR   TRAPV	U32 1	<Trap exception>
+	MK_VECTOR   FILL0	U32 1	<Reserved entry>
+	MK_VECTOR   FPE		U32 1	<Floating point exception>
+.endc

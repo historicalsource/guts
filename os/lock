@@ -1,0 +1,16 @@
+#!/bin/sh
+echo '-------------ALBAUGH-----------------';
+rlog -lalbaugh -L -R RCS/*,v;
+echo '-------------BIRMINGHAM--------------';
+rlog -lbirmingham -L -R RCS/*,v;
+echo '-------------MAJESKI-----------------';
+rlog -ltodd -L -R RCS/*,v;
+echo '-------------FORREST-----------------';
+rlog -lforrest -L -R RCS/*,v;
+echo '-------------GRISAFI-----------------';
+rlog -lgrisafi -L -R RCS/*,v;
+echo '-------------MCKEE-------------------';
+rlog -lmckee -L -R RCS/*,v;
+echo '-------------SHEPPERD----------------';
+rlog -lshepperd -L -R RCS/*,v;
+echo '_____________________________________'

@@ -1,0 +1,207 @@
+define LD_RULE
+	rm -f $(basename $@).err $$$$.err;\
+	touch $$$$.err;\
+	ls *.err | grep -v $$$$.err > /dev/null || true;\
+	rm -f $$$$.err;\
+	if [ ! -s *.err ];\
+	then\
+	  $(ECHO) "	$(LD)'ing $(@F) ...";\
+	  cp $< /tmp/$$$$; chmod +w /tmp/$$$$;\
+	  echo "INPUT ( $(filter-out %.c, $(filter-out %.lnk, $^)) )" >> /tmp/$$$$;\
+	  $(LD) $(LDFLAGS) -o $(@F) -Map $(basename $(@F)).map -T/tmp/$$$$ \
+		$(LIBDIRS) $(LIBS) > $(basename $(@F)).err 2>&1; \
+	  if [ ! -s $(basename $(@F)).err ];\
+	  then\
+	    rm -f $(basename $(@F)).err /tmp/$$$$ ; \
+	  else\
+	    $(ECHO) 'Errors in $(basename $(@F)).err';\
+	  fi\
+	else\
+	  $(ECHO) 'No link due to .err files:';\
+	  ls -l *.err;\
+	  exit 1;\
+	fi
+endef
+
+CHECKOUT = 0
+
+define FROM_RCS
+ cd $(subst RCS/,.,$(dir $<)); \
+ if [ -w $(@F) ];\
+ then \
+	echo "Warning: $@ is writeable but older than version in RCS"; \
+	exit 0; \
+ fi; \
+ if [ -r $(@F) ]; \
+ then \
+	if [ $(CHECKOUT) -eq 0 ]; \
+	then \
+		rcsdiff $(@F) > /dev/null 2>&1;\
+		if [ $$? -ne 0 ]; \
+		then \
+			echo "FYI: There's a newer version of $@ in RCS"; \
+		fi; \
+		exit 0; \
+	fi; \
+ fi; \
+ echo "	Checking out $@ ...";\
+ $(CO) $(COFLAGS) $(notdir $<) 
+endef
+
+define FROM_RCS_NOCD
+ if [ -w $(@F) ];\
+ then \
+	echo "Warning: $@ is writeable but older than version in RCS"; \
+	exit 0; \
+ fi; \
+ if [ -r $(@F) ]; \
+ then \
+	if [ $(CHECKOUT) -eq 0 ]; \
+	then \
+		rcsdiff $(@F) > /dev/null 2>&1;\
+		if [ $$? -ne 0 ]; \
+		then \
+			echo "FYI: There's a newer version of $@ in RCS"; \
+		fi; \
+		exit 0; \
+	fi; \
+ fi; \
+ echo "	Checking out $@ ...";\
+ $(CO) $(COFLAGS) $< 
+endef
+
+$(GUTS_INC)%.h : $(GUTS_INC_RCS)/%.h,v
+	$(FROM_RCS)
+
+%.mac : $(GUTS_INC_RCS)/%.mac,v
+	$(FROM_RCS_NOCD)
+
+%.nawk : $(GUTS_INC_RCS)/%.nawk,v
+	$(FROM_RCS_NOCD)
+
+%.h : $(GUTS_RCS)/%.h,v
+	$(FROM_RCS)
+
+%.c : $(GUTS_RCS)/%.c,v
+	$(FROM_RCS)
+ 
+%.mac : $(GUTS_RCS)/%.mac,v
+	$(FROM_RCS)
+
+define MAKE_H_RULE
+	$(ECHO) "\tMaking $(@F)"
+	rm -f $(basename $(@F)).err
+	$(PP) $(POUT)$@ $(PPFLAGS) -assem="OUTPUT_LANG == LANG_C" $(filter %def_pp.mac,$^) $<  > $(basename $(@F)).err 2>&1; \
+		if [ -s $(basename $(@F)).err ];\
+		then \
+			$(ECHO) "Errors in $(basename $(@F)).err";\
+		else\
+			rm -f $(basename $(@F)).err; \
+		fi
+endef
+
+%.h : %.mac $(DEF_PP)
+	$(MAKE_H_RULE)
+
+$(GUTS_INC)%.h : %.mac $(DEF_PP)
+	$(MAKE_H_RULE)
+
+%.txt : %.mac $(DEF_PP)
+	$(ECHO) "\tMaking $(notdir $@)"
+	rm -f $(basename $(@F)).err
+	$(PP) $(POUT)$(notdir $@) $(PPFLAGS) \
+		-assem="OUTPUT_LANG == LANG_TXT" \
+		$(filter %def_pp.mac,$^) $< \
+		> $(basename $(@F)).err 2>&1; \
+		if [ -s $(basename $(@F)).err ];\
+		then \
+			$(ECHO) "Errors in $(basename $(@F)).err";\
+		else\
+			rm -f $(basename $(@F)).err; \
+		fi
+
+%.coff : %.lnk $(DATE)
+	$(LD_RULE)
+
+%.elf : %.lnk $(DATE)
+	$(LD_RULE)
+
+%.dio : %.mix
+	${MIXIT} $<
+
+define ASM_RULE
+	rm -f $(basename $(@F)).lis $(basename $(@F)).pasm
+	$(ECHO) "\tMACPP'ing $< to $(basename $(@F)).pasm ..."
+	$(PP) $(ASM_PPFLAGS) $(POUT)$(basename $(@F)).pasm \
+		-assem="OUTPUT_LANG == $(OUTPUT_LANG)" \
+		$(DEF_PP) $< > $(basename $(@F)).err 2>&1; \
+	if [ ! -s $(basename $(@F)).err ];\
+	then\
+	  $(ECHO) "\t$(ASM)'ing $(basename $(@F)).pasm to $(basename $(@F)).o..."; \
+	  $(ASM) $(ASFLAGS) -o $(basename $(@F)).o $(basename $(@F)).pasm > $(basename $(@F)).err 2>&1;\
+	  if [ ! -s $(basename $(@F)).err ];\
+	  then\
+	    rm $(basename $(@F)).err;\
+	  else\
+	    $(ECHO) 'Errors in "$(basename $(@F)).pasm"';\
+	  fi\
+	else\
+	  $(ECHO) 'Errors in "$<"';\
+	fi
+endef
+
+%.o : %.asm $(DEF_PP)
+	$(ASM_RULE)
+
+%.o : %.mac $(DEF_PP)
+	$(patsubst .asm,.mac,$(ASM_RULE))
+
+%.o : %.c
+	$(ECHO) "\tCompiling $<..."
+	$(CC) $(CFLAGS) -c $< > $(basename $(@F)).err 2>&1;\
+	if [ ! -s $(basename $(@F)).err ];\
+	then\
+	  rm $(basename $(@F)).err;\
+	else\
+	  $(ECHO) 'Errors in "$<"';\
+	fi
+
+%.E : %.c
+	$(ECHO) "\tCCCP'ing $<..."
+	$(CC) $(CFLAGS) -E  $< > $(basename $(@F)).E
+
+%.D : %.c
+	$(ECHO) "\tCCCP'ing -M $<..."
+	$(CC) $(CFLAGS) -M  $< > $(basename $(@F)).D
+
+define DEPENDS_RULE
+	$(ECHO) "\tMaking dependencies ..."
+	rm -f $@
+	 $(CC) $(patsubst -pedantic,,$(patsubst -ansi,,$(CFLAGS))) -M $^ >> /tmp/$$$$.D; \
+	 $(ECHO) "\tfixup $@ ..."; \
+	 $(ECHO)  > /tmp/$$$$ "{" > /tmp/$$$$; \
+	 $(ECHO) >> /tmp/$$$$ "  gsub(\"$(R4KL_INCLUDE_PATH)//\",\"$$(STD_INCLUDE)\"); " ; \
+	 $(ECHO) >> /tmp/$$$$ "  gsub(\"$(R4KL_INCLUDE_PATH)/\",\"$$(STD_INCLUDE)\"); " ; \
+	 $(ECHO) >> /tmp/$$$$ "  gsub(\"$(R4KL_INCLUDE_PATH_HW)//\",\"$$(STD_STDDEF)\"); " ; \
+	 $(ECHO) >> /tmp/$$$$ "  gsub(\"$(R4KL_INCLUDE_PATH_HW)/\",\"$$(STD_STDDEF)\"); " ; \
+	 $(ECHO) >> /tmp/$$$$ "  gsub(\"$(GLIDE_INCLUDE_PATH)//\",\"$$(GLIDE_INCLUDE_PATH)/\"); " ; \
+	 $(ECHO) >> /tmp/$$$$ "  gsub(\"$(GLIDE_INCLUDE_PATH)/\",\"$$(GLIDE_INCLUDE_PATH)/\"); " ; \
+	 $(ECHO) >> /tmp/$$$$ "  gsub(\"$(GUTS_INC)/\",\"$$(GUTS_INC)\"); " ; \
+	 $(ECHO) >> /tmp/$$$$ "  gsub(\"$(GUTS_INC)\",\"$$(GUTS_INC)\"); " ; \
+	 $(ECHO) >> /tmp/$$$$ "  gsub(\" \\./\",\" \"); " ; \
+	 $(ECHO) >> /tmp/$$$$ "  if ( index(\$$0,\"\\:\") ) { " ; \
+	 $(ECHO) >> /tmp/$$$$ "     if (oldrule) print \"\t$$(TDFX_RULE)\"; " ; \
+	 $(ECHO) >> /tmp/$$$$ "     oldrule = 0; " ; \
+	 $(ECHO) >> /tmp/$$$$ "     if (index(\$$1, \"tdfx_\")) oldrule = 1; " ; \
+	 $(ECHO) >> /tmp/$$$$ "  }; " ; \
+	 $(ECHO) >> /tmp/$$$$ "  print" ; \
+	 $(ECHO) >> /tmp/$$$$ "}" ; \
+	 $(ECHO) >> /tmp/$$$$ "END { if (oldrule) print \"\t$$(TDFX_RULE)\"; }" ; \
+	 nawk -f /tmp/$$$$ < /tmp/$$$$.D > $@ ; \
+	 rm -f /tmp/$$$$ /tmp/$$$$.D
+	echo "Done"
+endef
+
+%.s : %.c
+	$(ECHO) "\tCC'ing $< to $(basename $(@F)).s..."
+	$(CC) $(CFLAGS) -g -S $< 

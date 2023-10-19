@@ -1,0 +1,208 @@
+;
+; $Id: config.mac,v 1.11 1997/11/11 01:43:58 forrest Exp forrest $
+;
+;	config.mac
+;
+;	This file defines which game (for the game-specific stuff) and
+;	"includes" the appropriate files for host board, video hardware,
+;	and game controls.
+;
+;	Project:	Flagstaff
+;	Date:		September 1997
+;	Team:		Forrest Miller, Dave Shepperd
+;
+.if true, OUTPUT_LANG == LANG_C
+#if !defined(_CONFIG_H_)
+#define _CONFIG_H_
+.endc
+REM < Special Game Flags	>
+;
+; >>->  Define your processor and other hardware features
+;
+	.include constants.mac
+	HEX_CONST PROCESSOR		MIPS5000L
+;
+	.include pptypes.mac
+;
+	HEX_CONST VIDEO_BOARD 		SST_V
+;
+	_STD_RES_ == 0
+.if true, _STD_RES_ == 0
+	DEC_CONST VIS_H_PIX		512
+	DEC_CONST VIS_V_PIX		384
+.iff
+	DEC_CONST VIS_H_PIX		512
+	DEC_CONST VIS_V_PIX		256
+.endc
+	DEC_CONST SQUAWK_ON_EXCEPT	0
+	DEC_CONST TIME_EXCEPTIONS	1
+	DEC_CONST NO_NMI_DETECTION	1	;Don't check for NMI
+	DEC_CONST DRAM_BANKS		1	;Number of DRAM banks
+	DEC_CONST BOOT_COPY_SELF	0	;Boot ourself
+	DEC_CONST NO_AUTO_TEST_MENU	1	;Suppress "ALL RAM" test
+;	DEC_CONST CPU_SPEED	200000000	< CPU clock speed in Hertz >
+	DEC_CONST CPU_SPEED_VARIABLE	1	< Enable dynamic CPU clock speed >
+	DEC_CONST BUS_SPEED	 50000000	< Bus (Galileo) clock speed in Hertz >
+	DEC_CONST PCI_SPEED	100000000/3	< PCI (Galileo) clock speed in Hertz >
+	DEC_CONST NO_FRBIT		0	< Enable all 32 FP registers >
+;
+.if true, OUTPUT_LANG == LANG_C
+#define RAM_TIME " (45 SEC)"
+ .if true, _STD_RES_ == 0
+#define SST_RESOLUTION			GR_RESOLUTION_512x384
+ .iff
+#define SST_RESOLUTION			GR_RESOLUTION_512x256
+ .endc
+#define SST_REFRESH_RATE		GR_REFRESH_60Hz
+#define SST_COLOR_FORMAT		GR_COLORFORMAT_ARGB
+#define SST_ORIGIN			GR_ORIGIN_LOWER_LEFT
+ .if defined, CPU_SPEED_VARIABLE
+  .if true, CPU_SPEED_VARIABLE
+extern int CPU_SPEED;
+  .endc
+ .endc
+.endc
+;
+	DEC_CONST MENU_X_DEFAULT	-1	< Default X position for menu items >
+	DEC_CONST ICELESS_IO		FALSE
+	DEC_CONST INCLUDE_FEXCP		1	< Include floating point exception handler >
+	HEX_CONST HAS_4MSINT		TRUE	< 4 millisecond interrupt >
+	HEX_CONST COIN_DOORS		1	< # of coin doors(2 mechs per)	>
+	HEX_CONST CREDS_REDUCE		0	< Do not reduce fractions >
+	HEX_CONST N_PLAYERS		1
+;
+	HEX_CONST HAS_CAGE	TRUE		< has a CAGE sound bd	>
+;
+	DEC_CONST SST_GAME	SST_RUSH	< SF Rush on PHOENIX >
+	DEC_CONST NET_USE_DMA	0		< for now:  no network DMA >
+;
+	DEC_CONST INCLUDE_QIO	1		< Include the QIO subsystem >
+	DEC_CONST INCLUDE_FSYS	1		< Include the FSYS subsystem >
+	DEC_CONST INCLUDE_IDE	1		< Include special IDE interrupt in shims >
+	DEC_CONST QIO_POOL_SIZE	(152*1024)	< This should be big enough >
+	DEC_CONST JUNK_POOL_SIZE 16*1024 	< Space for non-QIO malloc's (0=none allowed) >
+        DEC_CONST ICELESS_AST           1          < Use the new method of vectoring iceless interrupts >
+ 	HEX_CONST NU_IE			0xff01	< Nucleus turns off _all_ these bits >
+;
+	DEC_CONST IDE_TYPE	IDE_PCI		< PCI I/O >
+	DEC_CONST IDE_MAX_CAPACITY 2000000	< Set an artifical disk size of 1GB >
+;
+;NOTE: For ICELESS turn on DBG_ASN and assign it to interrupt 5 since that is where the
+;dispatcher is expecting the iceless interrupt to appear (CPU level 7). Next assign ICELESS_LVL
+;to either a 1 or 3 depending on which expansion slot.
+;
+	DBG_ASN == 5				; DEBUG switch interrupt comes in on level 5
+	TM3_ASN == 0				;Enable Galileo interrupt code on INT0_LVL
+	DM0_ASN == 0				; Galileo DMA channel 0 (All Galileo ints are on 0)
+	DM1_ASN == 0				; Galileo DMA channel 1 
+	DM2_ASN == 0				; Galileo DMA channel 2 
+	DM3_ASN == 0				; Galileo DMA channel 3 
+        IOA_ASN == 1                            ;Enable I/O ASIC interrupt code on INT1_LVL
+	IDE_ASN == 2				;Enable IDE interrupt servicing on INT2_LVL
+	VSY_ASN == 3				;Enable VSYNC interrupt servicing in INT3_LVL
+	ETH_ASN == 4				;Enable Ethernet interrupt servicing in INT4_LVL
+	WD2_ASN == 4				;Enable Wavenet interrupt servicing in INT4_LVL
+	DEC_CONST REMOTE_STATS  TRUE            < Include rmt.o functions >
+;
+	WHICH_IOASIC == 22
+	HEX_CONST PIC_XOR_CMD	0x5		< Pic XOR code >
+	.include flagstaff.mac
+;
+	DEC_CONST ICELESS_LVL	B_PIC_DBG+1	< bit within control register + 1 >
+	DEC_CONST UART_LVL      IOASIC_LVL      < Turn on the I/O ASIC UART interrupt code >
+	DEC_CONST CAGE_LVL      IOASIC_LVL      < Turn on the CAGE Audio interrupt code >
+;
+	HEX_CONST XBUS_BASE	GALILEO_CS0+0x00000000	< XBUS i/f board >
+	HEX_CONST RAMROM_BASE	XBUS_BASE+0x00400000	< RamRom board starts here (slot 1) >
+	HEX_CONST XBUSMON_BASE	XBUS_BASE+0x00800000	< XBUS monitor board is at (slot 2) >
+;
+	.include rush_switches.mac
+;
+	HEX_CONST POT_CNT	8
+	HEX_CONST AD_PORTS_ADDR A_TO_D	< pots.c uses this symbol >
+	HEX_CONST POT_BRAKE	0		< Pot brake index >
+	HEX_CONST POT_GAS	1		< Pot gas index >
+	HEX_CONST POT_CLUTCH	2		< Pot clutch index >
+	HEX_CONST POT_WHEEL	3		< Pot wheel index >
+;
+	DEC_CONST MAXCOINS	99		< Rush wants 99 coins >
+;
+; Video
+	.include sst.mac
+;
+REM <	Hardware I/O>
+	HEX_CONST VCR_RECORD	-1	< turn on vcr RECORD		>
+	HEX_CONST VCR_STOP	0	< STOP vcr			>
+.if not_defined, VCR_HOLD_TIME
+	DEC_CONST VCR_HOLD_TIME	20
+.endc
+REM <	SELFTEST common definitions>
+	DEC_CONST TEST_DWELL	<15.*60.> < How long to wait for NEXT in P.O.R>
+	HEX_CONST WDI_MASK	0x3FF	< longwords to try to clear btw wdogs>
+;
+.macro root2 arg
+ ...bit == 0
+ .rept 32
+  .iif true, ((1<<...bit) & arg), .rexit
+  ...bit == ...bit + 1
+ .endr
+.endm
+;
+.if true, OUTPUT_LANG == LANG_C
+root2	IO_DIPSW0
+	DEC_CONST B_DIPSW0	...bit
+#undef TEST
+#define TEST (~(ctl_read_sw(0)|(((~DIAG)&IO_DIPSW0)<<(B_TEST-B_DIPSW0))))
+#define RUMP_THUMP 0x8040
+#define NETWORK_ID_ADJUST ( 400000 )
+#define NET_INTVEC ETH_INTVEC	/* tmp */
+#define NET_LVL ETH_LVL		/* tmp */
+extern int go_to_self_test;
+#define ST_SWITCH (go_to_self_test||((DIAG&IO_DIPSW0) == 0))
+#undef HDW_INIT
+# define HDW_INIT(x) do { \
+	extern void prc_init_vecs(void), hdw_init(int), lma_init(void); \
+	prc_init_vecs(); \
+	hdw_init(x); \
+	lma_init(); \
+} while (0)
+#define DEBUG		1
+.endc
+;
+.if not_defined, PB_VALID
+REM <	Game config (PBASE) structure >
+	STR_START	pconfigb 
+	STR_FPTR	p_reset	void	1	< Points to code >
+	STR_ELT		p_optmenu <const unsigned char *> 1 < game option menu >
+	STR_ELT		p_coinmenu <const unsigned char *> 1 < coin opt menu >
+	STR_ELT		p_linktime <const char *> 1 < Main program link time >
+	STR_ELT		p_trapmode char	1	< trap type 0:STOP +:68K -:68010 >
+	STR_ELT		p_debug_options char 1	< Normally 0>
+	.if df,GAME_SPECIFIC
+	STR_FPTR	p_pf_draw int	1	< Points to code >
+	.endc
+	STR_ELT		p_oblist <void *> 1 <game-allocated object list memory>
+	STR_ELT		p_oblen <unsigned long> 1 <length in bytes of above>
+	STR_ELT		p_vers_valid <unsigned long> 1 <pconfigb version and validation>
+	STR_ELT		p_bss_start <const void *> 1 <start of working ram>
+	STR_ELT		p_bss_end <const void *> 1 <end of working ram>
+	STR_ELT		p_stats <const void *> 1 < pointer to game stats >
+	STR_ELT		p_trkmenu <const unsigned char *> 1 < pointer to track option menu >
+	STR_ELT		p_lapmenu <const unsigned char *> 1 < pointer to laps option menu >
+	STR_ELT		p_trnmenu <const unsigned char *> 1 < pointer to tournament option menu >
+;
+	STR_END		pconfigb
+;
+	STR_START	pconfigp
+	STR_ELT		p_validate long 1	< validation word	>
+	STR_PTR		p_configb <pconfigb> 1	< configuration pointer	>
+	STR_END		pconfigp
+;
+	HEX_CONST PB_VALID 0xDEADBEEF		<value to validate PTR	>
+.endc
+;
+REM <			EOF				>
+;
+.if true, OUTPUT_LANG == LANG_C
+#endif				/* _CONFIG_H_ */
+.endc

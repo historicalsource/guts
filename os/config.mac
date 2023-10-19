@@ -1,0 +1,207 @@
+;	config.mac
+;
+;	This file defines which game (for the game-specific stuff) and
+;	"includes" the appropriate files for host board, video hardware,
+;	and game controls.
+;
+;	Project:	Phoenix
+;	Date:		April 1996
+;	Team:		Dave Shepperd, Forrest Miller, Mike Albaugh
+;
+.if true, OUTPUT_LANG == LANG_C
+#if !defined(_CONFIG_H_)
+#define _CONFIG_H_
+.endc
+REM < Special Game Flags	>
+;
+; >>->  Define your processor and other hardware features
+;
+	.include constants.mac
+	HEX_CONST PROCESSOR		MIPS5000L
+;
+	.include pptypes.mac
+;
+	HEX_CONST VIDEO_BOARD 		SST_V
+;
+	DEC_CONST VIS_H_PIX		512.
+	DEC_CONST VIS_V_PIX		384
+	DEC_CONST DYNAMIC_PIXEL_CLOCK	1	;Enable pixel clock selection
+	DEC_CONST DYNAMIC_GAMMA_CORRECTION 1	;Enable dynamic gamma correction
+	DEC_CONST NO_FRBIT		0	< Allow the FR bit >
+	DEC_CONST SQUAWK_ON_EXCEPT	0
+	DEC_CONST TIME_EXCEPTIONS	0
+	DEC_CONST BOOT_COPY_SELF	1	;Boot ourself
+	DEC_CONST BOOT_FROM_DISK	1	;Boot from H.D.
+	DEC_CONST NO_NMI_DETECTION	1	;Don't check for NMI
+;	DEC_CONST NO_FFUNCTS		1	;Don't include fputs() et al. in phx_stubs.c
+	DEC_CONST NO_EXIT_FUNC		1	;Don't include exit() et al. in phx_stubs.c
+;	DEC_CONST STOP_ON_ERROR		1	;stop and loop on memory errors
+	DEC_CONST NO_AUTO_TEST_MENU	1	;Don't put up a RAM TEST ALL menu item
+	DEC_CONST NO_EER_WRITE		1	< Disable BRAM updates >
+	DEC_CONST NO_BRAM_AUS		1	;Don't prompt for 'ok' in bram test.
+	DEC_CONST NO_WDOG		1	;No WDOG in this code
+	DEC_CONST NO_ROM_TEST_MENU	1	;Don't include standard ROM test menu item
+	DEC_CONST ANNOUNCE_BOOT_ACTIONS 1	;squawk at boot
+;	DEC_CONST TEST_MEM64		1	;do 64 bit memory test
+;	DEC_CONST TEST_MEM32		1	;do 32 bit memory test
+;	DEC_CONST TEST_WALKING1		1	;enable walking one's
+;	DEC_CONST TEST_REFRESH		1	;enable refresh test
+	DEC_CONST SMC_SA_TESTS		1	;enable standalone test messages
+	DEC_CONST SA_DIAGS		1	;enable standalone diags
+;
+	DEC_CONST INCLUDE_QIO		1	< Include the QIO subsystem >
+	DEC_CONST INCLUDE_FSYS		1	< Include the FSYS subsystem >
+	DEC_CONST INCLUDE_IDE		1	< Include special IDE interrupt in shims >
+	DEC_CONST QIO_POOL_SIZE		(512*1024) < QIO and FSYS use this area. >
+	DEC_CONST JUNK_POOL_SIZE	-1	< Use all available space for malloc et al >
+        DEC_CONST ICELESS_AST           1	< Use the new method of vectoring iceless interrupts >
+;
+.if true, OUTPUT_LANG == LANG_C
+#define NO_GAME_LINKTIME		1	/* Don't show game link time */
+#define LINKTIME_X			((AN_VIS_COL-26)/2)	/* Center the link time(s) */
+#define SST_REFRESH_RATE		GR_REFRESH_60Hz
+#define SST_COLOR_FORMAT		GR_COLORFORMAT_ARGB
+#define SST_ORIGIN			GR_ORIGIN_LOWER_LEFT
+ .if defined, ANNOUNCE_BOOT_ACTIONS
+  .if true, ANNOUNCE_BOOT_ACTIONS
+extern int shims_puts(const char *s);
+extern int shims_printf(const char *ctl, ...);
+#define BLAB(x) shims_puts(x)
+#define BLABF(x) shims_printf x
+  .endc
+ .endc
+.endc
+;
+	DEC_CONST MENU_X_DEFAULT	-1	< Default X position for menu items >
+;	DEC_CONST INCLUDE_FEXCP		1	< Include floating point exception handler >
+	DEC_CONST IDE_TYPE	IDE_PCI		< PCI I/O >
+	DEC_CONST IDE_RW_VIA_DMA 1		< Allow DMA r/w >
+	DEC_CONST ICELESS_IO		FALSE
+;
+	DEC_CONST CPU_SPEED	150000000	< CPU clock speed in Hertz >
+	DEC_CONST BUS_SPEED	 50000000	< Bus (Galileo) clock speed in Hertz >
+	DEC_CONST PCI_SPEED	 33333333	< PCI (Galileo) clock speed in Hertz >
+	DEC_CONST SST_GAME	SST_DMS		< test game >
+;
+.if true, (OUTPUT_LANG == LANG_C)
+#define DEBUG		1
+#ifndef HDW_INIT
+# define HDW_INIT(x) do { \
+	extern void hdw_init(int); \
+	hdw_init(x);\
+} while (0)
+#endif
+.endc
+;
+;NOTE: For ICELESS turn on DBG_ASN and assign it to interrupt 5 since that is where the
+;dispatcher is expecting the iceless interrupt to appear (CPU level 7). Next assign ICELESS_LVL
+;to either a 1 or 3 depending on which expansion slot.
+;
+	DBG_ASN == 5				; DEBUG switch interrupt comes in on level 5
+	TM3_ASN == 0				;Enable Galileo interrupt code on INT0_LVL
+	DM0_ASN == 0
+;	DM1_ASN == 0
+;	DM2_ASN == 0
+;	DM3_ASN == 0
+        IOA_ASN == 1                            ;Enable I/O ASIC interrupt code on INT1_LVL
+	IDE_ASN == 2				;Enable IDE interrupt servicing on INT2_LVL
+	VSY_ASN == 3				;Enable VSYNC interrupt servicing in INT3_LVL
+	NSS_ASN == 4
+	EXP_ASN == 5				;Enable expansion slot (ICELESS) interrupt on INT5_LVL
+;
+	.include seattle.mac
+	.include nss_wb.mac
+	.include vmdvr.mac
+;
+	DEC_CONST ICELESS_LVL	B_PIC_DBG+1	< bit within control register + 1 >
+	DEC_CONST UART_LVL      IOASIC_LVL      < Turn on the I/O ASIC UART interrupt code >
+	DEC_CONST SND_LVL	IOASIC_LVL	< Turn on the I/O ASIC AUDIO interrupt code >
+;
+	HEX_CONST XBUS_BASE	GALILEO_CS0+0x00000000	< XBUS i/f board >
+	HEX_CONST RAMROM_BASE	XBUS_BASE+0x00400000	< RamRom board starts here (slot 1) >
+	.include generic_switches.mac
+;
+	HEX_CONST POT_CNT	8
+	HEX_CONST AD_PORTS_ADDR WB_A2D	< pots.c uses this symbol >
+	HEX_CONST POT_WHEEL	0		< Pot wheel index >
+	HEX_CONST POT_GAS	1		< Pot gas index >
+	HEX_CONST POT_BRAKE	2		< Pot brake index >
+	DEC_CONST POT_WHEN_OK	1		< Only touch pots when GUTS says it's ok >
+;
+; Video
+	.include sst.mac
+;
+REM <	Hardware I/O>
+	HEX_CONST VCR_RECORD	-1	< turn on vcr RECORD		>
+	HEX_CONST VCR_STOP	0	< STOP vcr			>
+.if not_defined, VCR_HOLD_TIME
+	DEC_CONST VCR_HOLD_TIME	20
+.endc
+REM <	SELFTEST common definitions>
+	DEC_CONST TEST_DWELL	<15.*60.> < How long to wait for NEXT in P.O.R>
+	HEX_CONST WDI_MASK	0x3FF	< longwords to try to clear btw wdogs>
+;
+.if true, OUTPUT_LANG == LANG_C
+#define NETWORK_ID_ADJUST ( 100000 )
+#define NET_INTVEC NSS_INTVEC	/* tmp */
+#define NET_LVL NSS_LVL		/* tmp */
+#undef B_TEST
+#define B_TEST (-1)
+#define ST_SWITCH (1)			/* Always go into selftest */
+.endc
+;
+.if not_defined, PB_VALID
+REM <	Game config (PBASE) structure >
+	STR_START	pconfigb 
+	STR_FPTR	p_reset	void	1	< Points to code >
+	STR_ELT		p_optmenu <const unsigned char *> 1 < game option menu >
+	STR_ELT		p_coinmenu <const unsigned char *> 1 < coin opt menu >
+	STR_ELT		p_linktime <const char *> 1 < Main program link time >
+	STR_ELT		p_trapmode char	1	< trap type 0:STOP +:68K -:68010 >
+	STR_ELT		p_debug_options char 1	< Normally 0>
+	.if df,GAME_SPECIFIC
+	STR_FPTR	p_pf_draw int	1	< Points to code >
+	.endc
+	STR_ELT		p_oblist <void *> 1 <game-allocated object list memory>
+	STR_ELT		p_oblen <unsigned long> 1 <length in bytes of above>
+	STR_ELT		p_vers_valid <unsigned long> 1 <pconfigb version and validation>
+	STR_ELT		p_bss_start <const void *> 1 <start of working ram>
+	STR_ELT		p_bss_end <const void *> 1 <end of working ram>
+	STR_ELT		p_stats <const void *> 1 < pointer to game stats >
+;
+	STR_END		pconfigb
+;
+	STR_START	pconfigp
+	STR_ELT		p_validate long 1	< validation word	>
+	STR_PTR		p_configb <pconfigb> 1	< configuration pointer	>
+	STR_END		pconfigp
+;
+	HEX_CONST PB_VALID 0xDEADBEEF		<value to validate PTR	>
+.endc
+;
+.if true, OUTPUT_LANG == LANG_C
+REM < Audio Configuration Vars >
+; /* temp - o - ary (SOUND_NEW_WRAPPER)  (keeps older systems building without a new makefile (but with new phx_audio.c))
+#define SOUND_NEW_MAKEFILE
+;
+#define SOUND_DEFAULT_OS 		 
+#define SOUND_TEST_BANK    
+#define SOUND_QUEUED_LATCH
+#define SOUND_DCS_STREAMED_AUDIO 
+; #define SOUND_DEBUG
+;
+; Overwriteable audio defaults
+; #define SOUND_SELF_TEST_BANK /*(U16 *data[])*/
+; #define SOUND_CALL_TABLE_SIZE 0x1000
+; #define SOUND_MAX_PARTITIONS 32
+; #define SOUND_DCS_CHANNELS 6
+#define SOUND_QUEUE_TIMER_TIME 1000   
+; #define SOUND_QUEUE_SIZE (1<<8)
+; /* note: SOUND_QUEUE_SIZE must be a power of 2 */
+;
+.endc
+REM <			EOF				>
+;
+.if true, OUTPUT_LANG == LANG_C
+#endif				/* _CONFIG_H_ */
+.endc

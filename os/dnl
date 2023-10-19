@@ -1,0 +1,15 @@
+#!/bin/sh
+
+#HOST=${1:-puddles}
+HOST=${1:-rerun}
+FILE1=${2:-os.elf}
+FILE2=${3:-../stub.hex}
+#FILE2=${3:-/home/sequoia/usr2/GUTS/phoenix/stubxb/stub.hex}
+RRDNL="rrdnl -v2 -h${HOST}"
+IC="icelessctl -h${HOST}"
+
+${IC} -c1
+$RRDNL $FILE1
+$RRDNL $FILE2 
+${IC} -c0
+

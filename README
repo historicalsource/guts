@@ -1,0 +1,44 @@
+Enclosed you will find the following 4 files which are built and used as libraries:
+
+cled.tar	- Interactive command line editor
+glide.tar	- 2.1.1 glide
+libz.tar	- compression/decompression library
+nsprintf.tar	- nsprintf functions (also include nisprintf
+			which is an integer only version, although
+			it isn't used by any of the 5k games)
+
+The following two are sources for the selftest code:
+
+comp.tar	- code that decompresses the EPROM image and boots it
+os.tar		- selftest code
+
+The following are executables for some utilities that
+these procedures use:
+
+utils.tar	- DOS and Linux versions of macpp and sources to elf2zo.
+		  (I didn't include the sources for macpp because I don't
+		   believe you have a hope in hell of getting it to
+		   compile in your environment; I won't testify that the
+		   DOS macpp will handle all of the .mac files that it may
+		   be needed for; you will also need to compile a
+		   version of libz for your environment to link with elf2zo)
+
+The procedure is to make directories for each of these:
+
+mkdir cled glide libz nsprintf comp os utils
+cd to and de-tar the respective .tar file into each directory.
+
+You will undoubtably need to edit (or rewrite) the makefile (or Makefile) in
+each directory to meet your needs. Most of the makefiles depend heavily on the
+extensions to GNU's make.
+
+Make all the libraries first.
+Make os.elf in the os directory next.
+Make decompbt.elf in the comp directory which depends on the os.elf
+	file having already been made.
+
+convert the decompbt.elf to an EPROM image and burn it into an
+eprom.
+
+If you need the C libraries too (m, c and gcc), let me know and I'll send them
+along later.

@@ -1,0 +1,178 @@
+.if not_defined, _PHX_SWITCHES_MAC_
+_PHX_SWITCHES_MAC_ == 0
+
+	VAR	  INPUTS	VU32	IO_PLAYER_21
+	VAR	  EXTEND	VU32	IO_PLAYER_43
+	VAR	  MISC		VU32	IO_MISC
+	VAR	  DIAG		VU32	IO_DIPSW
+;
+; Where they go in the switch word.
+;
+	HEX_CONST SH_INPUTS	0
+	HEX_CONST SH_EXTEND	0
+	HEX_CONST SH_MISC	16
+	HEX_CONST SH_DIAG	16
+;	HEX_CONST SH_INPUTS	0
+;	HEX_CONST SW_INPUTS	0x3f0f
+;	HEX_CONST SH_EXTEND	0
+;	HEX_CONST SH1_MISC	4
+;	HEX_CONST SH2_MISC	10
+;	HEX_CONST SH_DIAG	16
+;
+.if true, OUTPUT_LANG == LANG_C
+#define INPUT_SWITCHES ( ( INPUTS & 0xFFFF ) << SH_INPUTS )
+#if (0) /* Flagstaff does not have these */
+#define EXTEND_SWITCHES ( ( EXTEND & 0xFFFF ) << SH_EXTEND )
+#else
+#define EXTEND_SWITCHES ( ( 0xFFFF ) << SH_EXTEND )
+#endif
+#define MISC_SWITCHES ( ( MISC & 0xFFFF ) << SH_MISC )
+#define DIAG_SWITCHES ( ( DIAG & 0xFFFF ) << SH_DIAG )
+#define READ_RAW_SWITCHES(x) ( (x) ?\
+			    ~( EXTEND_SWITCHES | DIAG_SWITCHES ) :\
+			    ~( INPUT_SWITCHES | MISC_SWITCHES ) )
+;#define INPUT_SWITCHES ( ( INPUTS & SW_INPUTS ) << SH_INPUTS )
+;#define EXTEND_SWITCHES ( EXTEND << SH_EXTEND )
+;#define MISC_SWITCHES ( ( ( MISC & 0x0f ) << SH1_MISC ) | ( ( MISC & 0x70 ) << SH2_MISC ) )
+;#define DIAG_SWITCHES ( DIAG << SH_DIAG )
+;#define READ_RAW_SWITCHES(x) ( (x) ?\
+;			    ~( EXTEND_SWITCHES | DIAG_SWITCHES ) :\
+;			    ~( INPUT_SWITCHES | MISC_SWITCHES ) )
+.endc
+;
+	HEX_CONST SW_EDGES	0xFFFFFFFF
+	HEX_CONST SW_LEVELS	0x00000000
+;
+; DIP Switches
+;
+	HEX_CONST SW_OPT0	(IO_DIPSW0<<SH_DIAG)
+	HEX_CONST SW_OPT1	(IO_DIPSW1<<SH_DIAG)
+	HEX_CONST SW_OPT2	(IO_DIPSW2<<SH_DIAG)
+	HEX_CONST SW_OPT3	(IO_DIPSW3<<SH_DIAG)
+	HEX_CONST SW_OPT4	(IO_DIPSW4<<SH_DIAG)
+	HEX_CONST SW_OPT5	(IO_DIPSW5<<SH_DIAG)
+	HEX_CONST SW_OPT6	(IO_DIPSW6<<SH_DIAG)
+	HEX_CONST SW_OPT7	(IO_DIPSW7<<SH_DIAG)
+	HEX_CONST SW_OPT8	(IO_DIPSW8<<SH_DIAG)
+	HEX_CONST SW_OPT9	(IO_DIPSW9<<SH_DIAG)
+	HEX_CONST SW_OPT10	(IO_DIPSW10<<SH_DIAG)
+	HEX_CONST SW_OPT11	(IO_DIPSW11<<SH_DIAG)
+	HEX_CONST SW_OPT12	(IO_DIPSW12<<SH_DIAG)
+	HEX_CONST SW_OPT13	(IO_DIPSW13<<SH_DIAG)
+	HEX_CONST SW_OPT14	(IO_DIPSW14<<SH_DIAG)
+	HEX_CONST SW_OPT15	(IO_DIPSW15<<SH_DIAG)
+;
+REM	< SF RUSH Switches >
+;
+	HEX_CONST B_RAW_TEST	(4)
+	HEX_CONST B_TEST	(SH_MISC+B_RAW_TEST)
+;	HEX_CONST B_TEST	(SH2_MISC+B_RAW_TEST)
+;
+	HEX_CONST SW_ABORT	(IO_MISC2<<SH_MISC)	<Abort button>
+;	HEX_CONST SW_ABORT	(IO_MISC2<<SH1_MISC)	<Abort button>
+	HEX_CONST SW_VIEW1	(IO_PLYR1_0<<SH_INPUTS)	<V1 button>
+	HEX_CONST SW_VIEW2	(IO_PLYR1_1<<SH_INPUTS)	<V2 button>
+	HEX_CONST SW_VIEW3	(IO_PLYR1_2<<SH_INPUTS)	<V3 button>
+	HEX_CONST SW_MUSIC	(IO_PLYR1_3<<SH_INPUTS)	<Music button>
+	HEX_CONST SW_TRACK1	(IO_PLYR1_4<<SH_INPUTS)	<Track 1 switch>
+	HEX_CONST SW_TRACK2	(IO_PLYR1_5<<SH_INPUTS)	<Track 2 switch>
+	HEX_CONST SW_TRACK3	(IO_PLYR1_6<<SH_INPUTS)	<Track 3 switch>
+	HEX_CONST SW_TRACK4	(IO_PLYR1_7<<SH_INPUTS)	<Track 4 switch>
+	HEX_CONST SW_COINL	(IO_MISC0<<SH_MISC)	<Left coin switch>
+	HEX_CONST SW_COINR	(IO_MISC1<<SH_MISC)	<Right coin switch>
+;	HEX_CONST SW_COINL	(IO_MISC0<<SH1_MISC)	<Left coin switch>
+;	HEX_CONST SW_COINR	(IO_MISC1<<SH1_MISC)	<Right coin switch>
+	HEX_CONST SW_TILT	(IO_MISC3<<SH_MISC)	<Tilt switch>
+	HEX_CONST SW_TEST	(IO_MISC4<<SH_MISC)	<Test mode>
+	HEX_CONST SW_REVERSE	(IO_MISC5<<SH_MISC)	<Reverse button>
+	HEX_CONST SW_CREDIT	(IO_MISC6<<SH_MISC)	<Service credit>
+;	HEX_CONST SW_TEST	(IO_MISC4<<SH2_MISC)	<Test mode>
+;	HEX_CONST SW_REVERSE	(IO_MISC5<<SH2_MISC)	<Reverse button>
+;	HEX_CONST SW_CREDIT	(IO_MISC6<<SH2_MISC)	<Service credit>
+	HEX_CONST SW_FIRST	(IO_PLYR2_0<<SH_INPUTS)	<Shifter:  first gear>
+	HEX_CONST SW_SECOND	(IO_PLYR2_1<<SH_INPUTS)	<Shifter:  second gear>
+	HEX_CONST SW_THIRD	(IO_PLYR2_2<<SH_INPUTS)	<Shifter:  third gear>
+	HEX_CONST SW_FOURTH	(IO_PLYR2_3<<SH_INPUTS)	<Shifter:  fourth gear>
+	HEX_CONST SW_VOL_UP	(IO_PLYR2_4<<SH_INPUTS)	<Coin Door:  VOL. UP>
+	HEX_CONST SW_VOL_DN	(IO_PLYR2_5<<SH_INPUTS)	<Coin Door:  VOL. DOWN>
+	HEX_CONST SW_JOIN	(IO_PLYR2_7<<SH_INPUTS)	<Tournament Join Switch>
+;
+	HEX_CONST SW_NEXT	SW_REVERSE
+	HEX_CONST SW_ACTION	SW_ABORT
+	HEX_CONST SW_EXTRA	(1<<B_TEST)
+;
+	HEX_CONST J1_UP		SW_MUSIC
+	HEX_CONST J1_DOWN	SW_VIEW2
+	HEX_CONST J1_LEFT	SW_VIEW1
+	HEX_CONST J1_RIGHT	SW_VIEW3
+;
+	HEX_CONST J1_VERT	<J1_UP | J1_DOWN>
+;
+REM <	the switches let you do s/t options w/o L/R on stix	>
+	HEX_CONST J_UP		J1_UP
+	HEX_CONST J_DOWN	J1_DOWN
+	HEX_CONST J_LEFT	J1_LEFT
+	HEX_CONST J_RIGHT	J1_RIGHT
+;
+	HEX_CONST JOY_BITS	<J_UP | J_DOWN | J_LEFT | J_RIGHT>
+	HEX_CONST JOY_VERT	<J_UP | J_DOWN>
+;
+	HEX_CONST JOY_ALL	<JOY_BITS | SW_NEXT | SW_ACTION>
+	HEX_CONST SW_ALL	<SW_ACTION | SW_NEXT | SW_EXTRA>
+	HEX_CONST SW_BITS	0xFFFFFFFF
+;
+	HEX_CONST HANDSHAKE	<SW_VOL_UP|SW_VOL_DN>	<"Secret Handshake" for debug>
+;
+;	Lamps at LMA address 4 (Lower Power)
+;
+	HEX_CONST LA_VIEW1	0x080
+	HEX_CONST LA_VIEW2	0x040
+	HEX_CONST LA_VIEW3	0x020
+	HEX_CONST LA_MUSIC	0x010
+	HEX_CONST LA_ABORT	0x008
+	HEX_CONST LA_LAMP_MASK	0x0F8
+;
+;	Lamps at LMA address 5 (Higher Power)
+;
+	HEX_CONST LA_LEADER	0x100
+	HEX_CONST LA_WINNER	0x200
+	HEX_CONST LA_POWER_MASK	0x300
+;
+; Coin stuff
+;
+.if true, OUTPUT_LANG == LANG_C
+#define TEST (~(ctl_read_sw(0)|(((~DIAG)&IO_DIPSW0)<<B_TEST)))
+#define B_EMC		0		/* Rush has only 1 coin counter for one mech */
+#define LM_EMC_L	1
+#define LM_EMC_R	1
+# define IO_METER_P	*(VU32*)IO_METER
+# define COUNTER_ON(x)	do { IO_METER_P = 0x10; IO_METER_P |= 1<<(x); } while (0)
+# define COUNTER_OFF(x)	do { IO_METER_P = 0x10; IO_METER_P &= ~(1<<(x)); } while (0)
+;# define COUNTER_ON(x)	do { int oldipl; \
+;			     U32 meter; \
+;			     oldipl = prc_set_ipl(INTS_OFF); \
+;			     meter = *(VU32*)IO_METER; \
+;			     *(VU32*)IO_METER = meter | 0x10; \
+;			     *(VU32*)IO_METER = meter | 1<<(x); \
+;			     prc_set_ipl(oldipl); \
+;			   } while (0)
+;# define COUNTER_OFF(x)	do { int oldipl; \
+;			     U32 meter; \
+;			     oldipl = prc_set_ipl(INTS_OFF); \
+;			     meter = *(VU32*)IO_METER; \
+;			     *(VU32*)IO_METER = meter | 0x10; \
+;			     *(VU32*)IO_METER = meter & ~(1<<(x)); \
+;			     prc_set_ipl(oldipl); \
+;			   } while (0)
+
+#define B_COINL		(0)		/* COIN LEFT */
+#define B_COINR		(1)		/* COIN RIGHT */
+#define B_COIN3		(2)		/* COIN 3 */
+#define B_COIN4		(3)		/* COIN 4 */
+#define B_CREDIT	(6)		/* FE's Coin switch */
+#define B_DOLLAR	(7)		/* Dollar acceptor */
+#define CN_STATUS	((MISC&0x43)|((MISC&0x8000)>>8)|((MISC&0x180)>>5))
+#define B_BILL		B_DOLLAR
+.endc		; LANG_C
+;
+.endc

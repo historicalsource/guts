@@ -1,0 +1,174 @@
+N_TRIES	==	4
+EEPROM_SIZE == 2048
+STRIDE	== 2
+HST_INITIAL_COMPRESS == 0
+HST_TIE_TO_NEWER == 1
+;
+;
+;	Signature for each game should be unique to force re-init of stats
+;
+SIGNATURE <SFRush 1.4>
+;
+	.list ME
+; Someday we may get a handle on game-specified GUTS constants.
+; Until we do, moving the "stats" that audio.a references
+; to a place that does not move with every change in stats
+; staves off the impending disaster.
+; AUD_VOL sets the audio volume in game play
+DEF_STAT AUD_VOL,16,fixed,<audio volume level>
+; GUTS_OPT includes the "attract volume ratio"
+DEF_STAT GUTS_OPT,32,fixed,<GUTS options, incl. attract mute>
+;
+DEF_STAT CC0,16,fast,<Coin mech 1>
+DEF_STAT CC1,16,fast,<Coin mech 2>
+DEF_STAT CC2,16,fast,<Coin mech 3>
+DEF_STAT CC3,16,fast,<Coin mech 4>
+DEF_STAT CC4,16,fast,<Bill acceptor>
+DEF_STAT CCX,16,fast,<Service credit switch>
+;
+;	the 0PTIME (no player), 1PTIME, 2PTIME, ..., SESTIM
+;		game timers must be in order!
+;
+DEF_STAT 0PTIME,20,fast,<idle time>
+DEF_STAT 1PTIME,20,fast,<1 player time in play>
+;DEF_STAT 2PTIME,20,fast,<2 player time in play>
+;DEF_STAT SESTIM,20,fast,<session time>
+;
+;	The COINS (NEW/CONT then LR)
+;	must be contiguous, followed immediately by
+;	the TIMES for display purposes
+;
+;	in SIMUL games, use NEW,CONT,LEFT,[CENTER,]RIGHT
+;	in nonSIMUL: use NEW-1,CONT_1,NEW-2,CONT-2player
+;
+DEF_STAT NEWCOINS,20,fast,<new games>
+DEF_STAT CONTCOINS,20,fast,<cont games>
+DEF_STAT FREEGMS,20,fast,<earned games>
+DEF_STAT GMS,20,fast,<total games>
+;
+;	NEWTIM and CONTTIM must be in sequence with LRC
+;	  for display purposes
+;	LPL, CPL, RPL, and SESSION must be in sequence
+;	  to correctly accumulate run time
+;
+;	If non-SIMUL games, use:
+;	  NEW-1PL,NEW-2PL,NEW-3PL,CONT-1PL,CONT-2PL,CONT-3PL
+;
+DEF_STAT NEWTIM,20,fast,<new game time>
+DEF_STAT CONTTIM,20,fast,<continued game time>
+DEF_STAT FREETIM,20,fast,<earned game time>
+;
+DEF_STAT MIRROR,16,fast,<number of mirror games>
+DEF_STAT LINKED,16,fast,<number of linked games>
+;
+;DEF_STAT SESSIONS,20,fast,<total sessions>
+;DEF_STAT DRAWS,20,fast,<draw rounds>
+;DEF_STAT 1PGAMS,20,fast,<1 player games>
+;DEF_STAT 2PGAMS,20,fast,<2 player games>
+;
+DEF_STAT ERRORS,16,slow,<count of EEPROM errors>
+;
+;	Stats could be CLEARED to ERRORS (but are NOW
+;		cleared to CNOPT...
+;
+DEF_STAT HI_CNT,16,fast,<hi score games since hi-score reset>
+DEF_STAT GAME_CNT,16,fast,<games since hi-score reset>
+DEF_STAT CNOPT,32,fixed,<Coin mech options>
+DEF_STAT CNVAL,32,fixed,<Coin price options>
+DEF_STAT GMOPT,32,fixed,<game options>
+DEF_STAT TRKOPT,32,fixed,<Track options>
+DEF_STAT LAPOPT,32,fixed,<Number of laps options>
+DEF_STAT TRNOPT,32,fixed,<Tournament options>
+;
+;	Counters for system errors
+;
+; The counters with 'PROC' in their titles are used by the root
+; SOFT is used by aud_ctls.c
+; DISK may be used by phx_ide.c,
+; FSYS may be used by fsys.c
+; others are game dependent...
+;
+; >>->	KEEP THEM CONTIGUOUS so they can be cleared as a group!
+;
+DEF_STAT RESET,8,slow,<PROC non-powerup RESETS>
+DEF_STAT WR_RO,8,slow,<PROC write to read only mem>
+DEF_STAT RD_NEM,8,slow,<PROC read from non-existant mem>
+DEF_STAT WR_NEM,8,slow,<PROC write to non-existant mem>
+DEF_STAT ADRERR_R,8,slow,<PROC address alignment error on read>
+DEF_STAT ADRERR_W,8,slow,<PROC address alignment error on write>
+DEF_STAT BUSERR_I,8,slow,<PROC bus error on I fetch>
+DEF_STAT BUSERR_D,8,slow,<PROC bus error on D fetch>
+DEF_STAT SYSCALL,8,slow,<PROC SYSCALLS>
+DEF_STAT BREAKP,8,slow,<PROC Breakpoints>
+DEF_STAT ILGINS,8,slow,<PROC reserved instructions>
+DEF_STAT COPROC,8,slow,<PROC coprocessor unusables>
+DEF_STAT ARITH,8,slow,<PROC arithmetic overflows>
+DEF_STAT TRAP,8,slow,<PROC trap exceptions>
+DEF_STAT RESERV,8,slow,<PROC reserved exceptions>
+DEF_STAT FLOAT,8,slow,<PROC floating point exceptions>
+DEF_STAT UNDEF,8,slow,<PROC undefined exceptions>
+DEF_STAT OVERFL,8,slow,<PROC overflow checks>
+DEF_STAT DVDBY0,8,slow,<PROC divide by 0>
+DEF_STAT RANGE,8,slow,<PROC range checks>
+DEF_STAT UHINT,8,slow,<PROC unhandled interrupt>
+DEF_STAT MOVERFL,8,slow,<PROC multiply overflow>
+;DEF_STAT SNDSLST,8,slow,<SOFT sounds lost>
+DEF_STAT DATALST,8,slow,<SOFT sound data lost>
+DEF_STAT AUDRESET,8,slow,<SOFT sound proc resets>
+DEF_STAT LINKFAIL,8,slow,<SOFT LINK failures>
+DEF_STAT DSK_ERR,8,slow,<DISK any disk error>  
+DEF_STAT DSK_AMNF,8,slow,<DISK address not found>
+DEF_STAT DSK_TK0NF,8,slow,<DISK trk 0 not found>
+DEF_STAT DSK_ABORT,8,slow,<DISK command abort> 
+DEF_STAT DSK_IDNF,8,slow,<DISK ID not found>
+DEF_STAT DSK_UNCDTA,8,slow,<DISK uncorr data error>
+DEF_STAT DSK_TIMOUT,8,slow,<DISK device timeout>   
+DEF_STAT DSK_WERR,8,slow,<DISK write fault>
+DEF_STAT DSK_CORR,8,slow,<DISK correctable data err>
+DEF_STAT FSYS_USEALT,8,slow,<FSYS Used alternate file>  
+;
+; POT (A->D) calibration values
+;
+DEF_STAT POT0L,8,fixed,<Brake  - low limit>
+DEF_STAT POT1L,8,fixed,<Gas    - low limit>
+DEF_STAT POT2L,8,fixed,<Clutch - low limit>
+DEF_STAT POT3L,8,fixed,<Wheel  - low limit>
+DEF_STAT POT0H,8,fixed,<Brake  - high limit>
+DEF_STAT POT1H,8,fixed,<Gas    - high limit>
+DEF_STAT POT2H,8,fixed,<Clutch - high limit>
+DEF_STAT POT3H,8,fixed,<Wheel  - high limit>
+;
+; Cumulative (clear-proof, but not battery-removal-proof) coin counts
+;
+DEF_STAT CUM_COINS,32,slow,<lifetime cumulative coin count>
+DEF_STAT CUM_SERVICE,32,slow,<lifetime cumulative AUX-coin count>
+;
+; name of hist, #of bins, sizeof first, sizeof rest,title[,fields]
+;
+DEF_HISTOGRAM NEWGAME,20,30,30,<New Game Times (seconds)>
+DEF_HISTOGRAM CONTGAME,20,30,30,<Continued Game Times (seconds)>
+DEF_HISTOGRAM FREEGAME,20,30,30,<Earned Game Times (seconds)>
+DEF_HISTOGRAM CAR,12,1,1,<Car Selected:\t 1\t 2\t 3\t 4\t 5\t 6\t 7\t 8\t 9\t10\t11\t12>
+DEF_HISTOGRAM TRK,8,1,1,<Track Selected:\t 1\t 2\t 3\t 4\t 5\t 6\t 7\t 8>
+;
+;	EXAMPLES of specifying the Histogram bin labels:
+;DEF_HISTOGRAM TANKSELECT,6,1,1,<Tank Selects\tSPEED   \tSTEALTH \tASSAULT \tHYPER   \tLURKER  \tSUICIDE >
+;DEF_HISTOGRAM HUMAN_RANK,4,1,1,<Human Rank in SOLO games\t1: \t2: \t3: \t4: >
+;	You want all the labels to have the same length for the best looking display.
+;	If the labels have a ":" then the MEDIAN is displayed otherwise it is not displayed.
+;
+;
+; High Score Table(s)
+;;;DEF_H_S_T	TOPGAME,10,4,3,8	; 10 tot,4 perm,3 score & 8 init bytes
+; Following is kluge to store game serial number using "High Score" code.
+;DEF_H_S_T	SERIAL_NUM,1,1,3,3	; 1 tot,1 perm,3 "score", 3 "init" bytes
+DEF_H_S_T	TRACK1_TOP,10,10,4,8	; 10 tot, 10 perm, 4 score & 8 init bytes
+DEF_H_S_T	TRACK2_TOP,10,10,4,8	; 10 tot, 10 perm, 4 score & 8 init bytes
+DEF_H_S_T	TRACK3_TOP,10,10,4,8	; 10 tot, 10 perm, 4 score & 8 init bytes
+DEF_H_S_T	TRACK4_TOP,10,10,4,8	; 10 tot, 10 perm, 4 score & 8 init bytes
+DEF_H_S_T	TRACK5_TOP,10,10,4,8	; 10 tot, 10 perm, 4 score & 8 init bytes
+DEF_H_S_T	TRACK6_TOP,10,10,4,8	; 10 tot, 10 perm, 4 score & 8 init bytes
+DEF_H_S_T	TRACK7_TOP,10,10,4,8	; 10 tot, 10 perm, 4 score & 8 init bytes
+DEF_H_S_T	TRACK8_TOP,10,10,4,8	; 10 tot, 10 perm, 4 score & 8 init bytes
+;
+EPILOGUE

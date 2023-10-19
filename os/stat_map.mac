@@ -1,0 +1,114 @@
+N_TRIES	==	4
+EEPROM_SIZE == 2040
+STRIDE	== 2
+HST_INITIAL_COMPRESS == 0
+HST_TIE_TO_NEWER == 0
+;
+;
+;	Signature for each game should be unique to force re-init of stats
+;
+SIGNATURE <DMS stats 10/11/97>
+;
+	.list ME
+;
+DEF_STAT CC0,16,fast,<Coin mech 1>
+DEF_STAT CC1,16,fast,<Coin mech 2>
+DEF_STAT CC2,16,fast,<Coin mech 3>
+DEF_STAT CC3,16,fast,<Coin mech 4>
+DEF_STAT CCB,16,fast,<Bill acceptor>
+DEF_STAT CCX,16,fast,<Service credit switch>
+;
+;	the 0PTIME (no player), 1PTIME, 2PTIME, ..., SESTIM
+;		game timers must be in order!
+;
+DEF_STAT 0PTIME,20,wrap,<idle time>
+;
+;	The COINS (NEW/CONT then LR)
+;	must be contiguous, followed immediately by
+;	the TIMES for display purposes
+;
+;	in SIMUL games, use NEW,CONT,LEFT,[CENTER,]RIGHT
+;	in nonSIMUL: use NEW-1,CONT_1,NEW-2,CONT-2player
+;
+DEF_STAT NEWCOINS,20,fast,<new games>
+DEF_STAT CONTCOINS,20,fast,<cont games>
+;
+DEF_STAT ERRORS,16,slow,<count of EEPROM errors>
+;
+DEF_STAT CNOPT,32,fixed,<coin options>
+DEF_STAT CNVAL,32,fixed,<Coin price options>
+DEF_STAT GMOPT,32,fixed,<game options>
+DEF_STAT GUTS_OPT,32,fixed,<GUTS options, incl. attract mute>
+;
+;       Counters for system errors
+;
+; The counters with 'PROC' in their titles are used by the root
+; SOFT is used by aud_ctls.c
+; DISK may be used by phx_ide.c,
+; FSYS may be used by fsys.c
+; others are game dependent...
+;
+; >>->  KEEP THEM CONTIGUOUS so they can be cleared as a group!
+;
+DEF_STAT RESET,8,slow,<PROC non-powerup RESETS>
+DEF_STAT WR_RO,8,slow,<PROC write to read only mem>
+DEF_STAT RD_NEM,8,slow,<PROC read from non-existant mem>
+DEF_STAT WR_NEM,8,slow,<PROC write to non-existant mem>
+DEF_STAT ADRERR_R,8,slow,<PROC address alignment error on read>
+DEF_STAT ADRERR_W,8,slow,<PROC address alignment error on write>
+DEF_STAT BUSERR_I,8,slow,<PROC bus error on I fetch>
+DEF_STAT BUSERR_D,8,slow,<PROC bus error on D fetch>
+DEF_STAT SYSCALL,8,slow,<PROC SYSCALLS>
+DEF_STAT BREAKP,8,slow,<PROC Breakpoints>
+DEF_STAT ILGINS,8,slow,<PROC reserved instructions>
+DEF_STAT COPROC,8,slow,<PROC coprocessor unusables>
+DEF_STAT ARITH,8,slow,<PROC arithmetic overflows>
+DEF_STAT TRAP,8,slow,<PROC trap exceptions>
+DEF_STAT RESERV,8,slow,<PROC reserved exceptions>
+DEF_STAT FLOAT,8,slow,<PROC floating point exceptions>
+DEF_STAT UNDEF,8,slow,<PROC undefined exceptions>
+DEF_STAT OVERFL,8,slow,<PROC overflow checks>
+DEF_STAT DVDBY0,8,slow,<PROC divide by 0>
+DEF_STAT RANGE,8,slow,<PROC range checks>
+DEF_STAT UHINT,8,slow,<PROC unhandled interrupt>
+DEF_STAT MOVERFL,8,slow,<PROC multiply overflow>
+;DEF_STAT SNDSLST,8,slow,<SOFT sounds lost>
+DEF_STAT DATALST,8,slow,<SOFT sound data lost>
+DEF_STAT AUDRESET,8,slow,<SOFT sound proc resets>
+DEF_STAT LINKFAIL,8,slow,<SOFT LINK failures>
+DEF_STAT DSK_ERR,8,slow,<DISK any disk error>  
+DEF_STAT DSK_AMNF,8,slow,<DISK address not found>
+DEF_STAT DSK_TK0NF,8,slow,<DISK trk 0 not found>
+DEF_STAT DSK_ABORT,8,slow,<DISK command abort> 
+DEF_STAT DSK_IDNF,8,slow,<DISK ID not found>
+DEF_STAT DSK_UNCDTA,8,slow,<DISK uncorr data error>
+DEF_STAT DSK_TIMOUT,8,slow,<DISK device timeout>   
+DEF_STAT DSK_WERR,8,slow,<DISK write fault>
+DEF_STAT DSK_CORR,8,slow,<DISK correctable data err>
+DEF_STAT FSYS_USEALT,8,slow,<FSYS Used alternate file>  
+;
+; VALUE for adjusting the audio volume
+;
+DEF_STAT AUD_VOL,16,fixed,<audio volume level>
+;
+; POT (A->D) calibration values
+;
+DEF_STAT POT0L,8,fixed,<Pot 0 - low limit>
+DEF_STAT POT1L,8,fixed,<Pot 1 - low limit>
+DEF_STAT POT2L,8,fixed,<Pot 2 - low limit>
+DEF_STAT POT3L,8,fixed,<Pot 3 - low limit>
+DEF_STAT POT4L,8,fixed,<Pot 4 - low limit>
+DEF_STAT POT5L,8,fixed,<Pot 5 - low limit>
+DEF_STAT POT6L,8,fixed,<Pot 6 - low limit>
+DEF_STAT POT7L,8,fixed,<Pot 7 - low limit>
+DEF_STAT POT0H,8,fixed,<Pot 0 - high limit>
+DEF_STAT POT1H,8,fixed,<Pot 1 - high limit>
+DEF_STAT POT2H,8,fixed,<Pot 2 - high limit>
+DEF_STAT POT3H,8,fixed,<Pot 3 - high limit>
+DEF_STAT POT4H,8,fixed,<Pot 4 - high limit>
+DEF_STAT POT5H,8,fixed,<Pot 5 - high limit>
+DEF_STAT POT6H,8,fixed,<Pot 6 - high limit>
+DEF_STAT POT7H,8,fixed,<Pot 7 - high limit>
+;
+;
+EPILOGUE

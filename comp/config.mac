@@ -1,0 +1,60 @@
+;	$Id: config.mac,v 1.28 1997/10/16 01:50:58 shepperd Exp $
+;
+;	This file defines which game (for the game-specific stuff) and
+;	"includes" the appropriate files for host board, video hardware,
+;	and game controls.
+;
+;	Project:	Flagstaff
+;	Date:		August 1996
+;	Team:		Forrest Miller, Dave Shepperd
+;
+.if true, OUTPUT_LANG == LANG_C
+#if !defined(_CONFIG_H_)
+#define _CONFIG_H_
+.endc
+REM < Special Game Flags	>
+;
+; >>->  Define your processor and other hardware features
+;
+	.include constants.mac
+	HEX_CONST PROCESSOR		MIPS5000L
+;
+	.include pptypes.mac
+;
+	DEC_CONST BOOT_COMPRESSED	1	;Signal we're to boot compressed EPROM code
+	DEC_CONST BOOT_COPY_SELF	1	;Boot ourself
+	DEC_CONST BOOT_GAME_ONLY	0	;Boot only the game code
+	DEC_CONST BOOT_GUTS_ONLY	1	;Boot only the GUTS code
+	DEC_CONST NO_NMI_DETECTION	1	;Don't check for NMI
+	DEC_CONST NO_FFUNCTS		1	;Don't include fputs() et al. in phx_stubs.c
+	DEC_CONST NO_EXIT_FUNC		1	;Don't include exit() et al. in phx_stubs.c
+	DEC_CONST DRAM_BANKS		1	;Number of DRAM banks
+	DEC_CONST SA_DIAGS		1	;Enable select SA DIAGS in phx_root
+	DEC_CONST TEST_MEM32    	1       ;Enable DRAM test at boot
+	DEC_CONST TEST_MEM64    	1       ;Enable DRAM test at boot
+;	DEC_CONST TESTMEM32_PART1   0x00100000	;Test the first 1MB of memory while in EPROM
+	DEC_CONST TEST_REFRESH  	1       ;Enable refresh test too
+	DEC_CONST TEST_BRAM	    	0       ;Disable Bram test at boot
+	DEC_CONST STOP_ON_ERROR 	1       ;Stop and loop on mem errors
+	DEC_CONST NO_EER_WRITE		1	;Don't set BRAM
+	DEC_CONST NO_WDOG		1	;Don't kick watchdog after setting up Galileo
+;
+	DEC_CONST QIO_POOL_SIZE		0	;Disable the QIO pool
+	DEC_CONST JUNK_POOL_SIZE	-1	< Use all available space for malloc et al >
+;
+	DEC_CONST CPU_SPEED	150000000	< CPU clock speed in Hertz >
+	DEC_CONST BUS_SPEED	 50000000	< Bus (Galileo) clock speed in Hertz >
+	DEC_CONST PCI_SPEED	100000000/3	< PCI (Galileo) clock speed in Hertz >
+;
+;	DEC_CONST WHICH_IOASIC	32		< Use Memory map 3, DIP switch map 2 >
+	.include seattle.mac
+;
+	HEX_CONST XBUS_BASE	GALILEO_CS0+0x00000000	< XBUS i/f board >
+	HEX_CONST RAMROM_BASE	XBUS_BASE+0x00400000	< RamRom board starts here (slot 1) >
+;
+REM <	Hardware I/O>
+REM <	SELFTEST common definitions>
+;
+.if true, OUTPUT_LANG == LANG_C
+#endif				/* _CONFIG_H_ */
+.endc
